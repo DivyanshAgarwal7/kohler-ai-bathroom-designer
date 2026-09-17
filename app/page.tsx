@@ -2,7 +2,20 @@
 
 import Image from 'next/image';
 import { FormEvent, useEffect, useState } from 'react';
+import {
+  Sparkles,
+  Image as ImageIcon,
+  Scan,
+  Wand2,
+  ExternalLink,
+  Droplets,
+  LayoutGrid,
+  Loader2,
+  CircleAlert,
+  CheckCircle2,
+} from 'lucide-react';
 
+import { Button } from '@/components/ui/button';
 import BathroomLayout from '@/components/bathroom-layout';
 import { generateTemplateExplanation } from '@/lib/ai/fallback';
 
@@ -459,12 +472,24 @@ export default function Home() {
     }
   }
 
+  const workflowStep = loading ? 2 : result ? 3 : 1;
+
+  const WORKFLOW_STEPS = [
+    { step: 1, label: 'Requirements' },
+    { step: 2, label: 'Optimization' },
+    { step: 3, label: 'Your Design' },
+  ] as const;
+
   return (
-    <main className="min-h-screen bg-neutral-50 text-neutral-950">
+    <main className="min-h-screen bg-stone-50 text-neutral-950">
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         {/* Header */}
-        <header className="mb-10">
-          <div className="mb-3 text-sm font-semibold uppercase tracking-[0.18em] text-neutral-500">
+        <header className="mb-8">
+          <div className="mb-3 flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.18em] text-neutral-500">
+            <Sparkles
+              className="size-4 text-brand"
+              aria-hidden="true"
+            />
             KOHLER AI Bathroom Designer
           </div>
 
@@ -482,6 +507,60 @@ export default function Home() {
             </p>
           </div>
         </header>
+
+        {/* Workflow indicator */}
+        <ol
+          aria-label="Design workflow progress"
+          className="mb-8 flex flex-wrap items-center gap-x-2 gap-y-2 text-sm"
+        >
+          {WORKFLOW_STEPS.map(({ step, label }, index) => {
+            const isComplete = workflowStep > step;
+            const isCurrent = workflowStep === step;
+
+            return (
+              <li key={step} className="flex items-center gap-2">
+                <span
+                  aria-current={isCurrent ? 'step' : undefined}
+                  className={`flex items-center gap-2 rounded-full border px-3 py-1.5 font-medium transition-colors ${
+                    isCurrent
+                      ? 'border-brand bg-brand text-white'
+                      : isComplete
+                        ? 'border-neutral-300 bg-white text-neutral-700'
+                        : 'border-neutral-200 bg-white text-neutral-400'
+                  }`}
+                >
+                  {isComplete ? (
+                    <CheckCircle2
+                      className="size-4"
+                      aria-hidden="true"
+                    />
+                  ) : (
+                    <span
+                      className={`flex size-4 items-center justify-center rounded-full text-[10px] ${
+                        isCurrent
+                          ? 'bg-white/20'
+                          : 'bg-neutral-100'
+                      }`}
+                      aria-hidden="true"
+                    >
+                      {step}
+                    </span>
+                  )}
+                  {label}
+                </span>
+
+                {index < WORKFLOW_STEPS.length - 1 && (
+                  <span
+                    className="text-neutral-300"
+                    aria-hidden="true"
+                  >
+                    &rarr;
+                  </span>
+                )}
+              </li>
+            );
+          })}
+        </ol>
 
         <div className="grid gap-8 lg:grid-cols-[360px_1fr]">
           {/* Requirement form */}
@@ -504,7 +583,11 @@ export default function Home() {
               {/* AI description */}
               <div className="mb-6 rounded-2xl border border-neutral-200 bg-neutral-50 p-4">
                 <div className="mb-3">
-                  <div className="text-sm font-semibold">
+                  <div className="flex items-center gap-1.5 text-sm font-semibold">
+                    <Sparkles
+                      className="size-4 text-neutral-500"
+                      aria-hidden="true"
+                    />
                     Describe your bathroom
                   </div>
 
@@ -521,32 +604,54 @@ export default function Home() {
                   }
                   placeholder="Example: I have a 7 by 9 foot bathroom for 4 people. I want a modern and water-saving design with a budget of 1.5 lakh rupees."
                   rows={5}
-                  className="w-full resize-none rounded-xl border border-neutral-300 bg-white px-3 py-3 text-sm outline-none focus:border-neutral-950"
+                  className="w-full resize-none rounded-xl border border-neutral-300 bg-white px-3 py-3 text-sm outline-none transition-colors focus:border-neutral-950 focus-visible:ring-2 focus-visible:ring-neutral-950/20"
                 />
 
                 <button
                   type="button"
                   onClick={handleAIInterpret}
                   disabled={aiLoading}
-                  className="mt-3 w-full rounded-xl border border-neutral-300 bg-white px-4 py-3 text-sm font-medium transition hover:bg-neutral-100 disabled:cursor-not-allowed disabled:opacity-60"
+                  className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl border border-neutral-300 bg-white px-4 py-3 text-sm font-medium transition-colors hover:bg-neutral-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-950/30 focus-visible:ring-offset-1 active:bg-neutral-200 disabled:cursor-not-allowed disabled:opacity-60"
                 >
+                  {aiLoading ? (
+                    <Loader2
+                      className="size-4 animate-spin"
+                      aria-hidden="true"
+                    />
+                  ) : (
+                    <Sparkles
+                      className="size-4"
+                      aria-hidden="true"
+                    />
+                  )}
                   {aiLoading
                     ? 'Understanding...'
                     : 'Understand with AI'}
                 </button>
 
                 {aiError && (
-                  <div className="mt-3 rounded-xl border border-red-200 bg-red-50 p-3 text-xs text-red-700">
-                    {aiError}
+                  <div className="mt-3 flex items-start gap-2 rounded-xl border border-red-200 bg-red-50 p-3 text-xs text-red-700">
+                    <CircleAlert
+                      className="mt-0.5 size-3.5 shrink-0"
+                      aria-hidden="true"
+                    />
+                    <span>{aiError}</span>
                   </div>
                 )}
 
                 {/* Image analysis */}
                 <div className="mt-5 border-t border-neutral-200 pt-5">
                   <div className="mb-3">
-                    <div className="text-sm font-semibold">
+                    <label
+                      htmlFor="bathroom-image"
+                      className="flex items-center gap-1.5 text-sm font-semibold"
+                    >
+                      <ImageIcon
+                        className="size-4 text-neutral-500"
+                        aria-hidden="true"
+                      />
                       Optional bathroom image
-                    </div>
+                    </label>
 
                     <p className="mt-1 text-xs leading-5 text-neutral-500">
                       Upload a bathroom photo or floor
@@ -575,7 +680,7 @@ export default function Home() {
                         setImagePreview('');
                       }
                     }}
-                    className="block w-full text-sm"
+                    className="block w-full cursor-pointer rounded-lg text-sm outline-none file:mr-3 file:cursor-pointer file:rounded-lg file:border-0 file:bg-neutral-950 file:px-3 file:py-2 file:text-xs file:font-medium file:text-white hover:file:bg-neutral-800 focus-visible:ring-2 focus-visible:ring-neutral-950/30"
                   />
 
                   {imagePreview && (
@@ -597,16 +702,31 @@ export default function Home() {
                     disabled={
                       !imageFile || imageLoading
                     }
-                    className="mt-3 w-full rounded-xl border border-neutral-300 bg-white px-4 py-3 text-sm font-medium transition hover:bg-neutral-100 disabled:cursor-not-allowed disabled:opacity-60"
+                    className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl border border-neutral-300 bg-white px-4 py-3 text-sm font-medium transition-colors hover:bg-neutral-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-950/30 focus-visible:ring-offset-1 active:bg-neutral-200 disabled:cursor-not-allowed disabled:opacity-60"
                   >
+                    {imageLoading ? (
+                      <Loader2
+                        className="size-4 animate-spin"
+                        aria-hidden="true"
+                      />
+                    ) : (
+                      <Scan
+                        className="size-4"
+                        aria-hidden="true"
+                      />
+                    )}
                     {imageLoading
                       ? 'Analyzing image...'
                       : 'Analyze image'}
                   </button>
 
                   {imageError && (
-                    <div className="mt-3 rounded-xl border border-red-200 bg-red-50 p-3 text-xs text-red-700">
-                      {imageError}
+                    <div className="mt-3 flex items-start gap-2 rounded-xl border border-red-200 bg-red-50 p-3 text-xs text-red-700">
+                      <CircleAlert
+                        className="mt-0.5 size-3.5 shrink-0"
+                        aria-hidden="true"
+                      />
+                      <span>{imageError}</span>
                     </div>
                   )}
 
@@ -704,7 +824,7 @@ export default function Home() {
                   onChange={(event) =>
                     setWidthFt(event.target.value)
                   }
-                  className="w-full rounded-xl border border-neutral-300 bg-white px-3 py-2.5 outline-none transition focus:border-neutral-950"
+                  className="w-full rounded-xl border border-neutral-300 bg-white px-3 py-2.5 outline-none transition-colors focus:border-neutral-950 focus-visible:ring-2 focus-visible:ring-neutral-950/20"
                 />
               </div>
 
@@ -727,7 +847,7 @@ export default function Home() {
                   onChange={(event) =>
                     setLengthFt(event.target.value)
                   }
-                  className="w-full rounded-xl border border-neutral-300 bg-white px-3 py-2.5 outline-none transition focus:border-neutral-950"
+                  className="w-full rounded-xl border border-neutral-300 bg-white px-3 py-2.5 outline-none transition-colors focus:border-neutral-950 focus-visible:ring-2 focus-visible:ring-neutral-950/20"
                 />
               </div>
 
@@ -750,7 +870,7 @@ export default function Home() {
                   onChange={(event) =>
                     setBudgetINR(event.target.value)
                   }
-                  className="w-full rounded-xl border border-neutral-300 bg-white px-3 py-2.5 outline-none transition focus:border-neutral-950"
+                  className="w-full rounded-xl border border-neutral-300 bg-white px-3 py-2.5 outline-none transition-colors focus:border-neutral-950 focus-visible:ring-2 focus-visible:ring-neutral-950/20"
                 />
               </div>
 
@@ -771,7 +891,7 @@ export default function Home() {
                       event.target.value as StyleTheme
                     )
                   }
-                  className="w-full rounded-xl border border-neutral-300 bg-white px-3 py-2.5 outline-none transition focus:border-neutral-950"
+                  className="w-full rounded-xl border border-neutral-300 bg-white px-3 py-2.5 outline-none transition-colors focus:border-neutral-950 focus-visible:ring-2 focus-visible:ring-neutral-950/20"
                 >
                   {STYLE_OPTIONS.map((option) => (
                     <option
@@ -802,7 +922,7 @@ export default function Home() {
                   onChange={(event) =>
                     setHouseholdSize(event.target.value)
                   }
-                  className="w-full rounded-xl border border-neutral-300 bg-white px-3 py-2.5 outline-none transition focus:border-neutral-950"
+                  className="w-full rounded-xl border border-neutral-300 bg-white px-3 py-2.5 outline-none transition-colors focus:border-neutral-950 focus-visible:ring-2 focus-visible:ring-neutral-950/20"
                 />
               </div>
 
@@ -821,31 +941,63 @@ export default function Home() {
               </div>
 
               {/* Generate */}
-              <button
+              <Button
                 type="submit"
                 disabled={loading}
-                className="w-full rounded-xl bg-neutral-950 px-4 py-3 font-medium text-white transition hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-60"
+                size="lg"
+                className="group h-auto w-full gap-2 rounded-xl bg-brand py-3.5 text-base font-semibold text-white shadow-md shadow-brand/20 transition-all hover:bg-brand-hover hover:shadow-lg hover:shadow-brand/30 focus-visible:ring-brand/40 active:bg-brand-active active:shadow-sm disabled:cursor-not-allowed disabled:opacity-60 disabled:shadow-none"
               >
+                {loading ? (
+                  <Loader2
+                    className="size-5 animate-spin"
+                    aria-hidden="true"
+                  />
+                ) : (
+                  <Wand2
+                    className="size-5 transition-transform group-hover:rotate-12"
+                    aria-hidden="true"
+                  />
+                )}
                 {loading
-                  ? 'Optimizing bathroom...'
-                  : 'Generate my bathroom'}
-              </button>
+                  ? 'Optimizing your bathroom...'
+                  : 'Generate My Bathroom'}
+              </Button>
             </form>
 
             {error && (
-              <div className="mt-4 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
-                {error}
+              <div className="mt-4 flex items-start gap-2 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+                <CircleAlert
+                  className="mt-0.5 size-4 shrink-0"
+                  aria-hidden="true"
+                />
+                <span>{error}</span>
               </div>
             )}
           </section>
 
           {/* Results */}
           <section>
+            {/* Dedicated status region: announces state changes to screen
+                readers without exposing the whole results panel as a live
+                region (which would re-announce every card on every update). */}
+            <p role="status" aria-live="polite" className="sr-only">
+              {loading
+                ? 'Optimizing your bathroom...'
+                : result
+                  ? result.bundles.length > 0
+                    ? 'Your design is ready.'
+                    : 'No feasible bathroom configuration was found.'
+                  : ''}
+            </p>
+
             {!result && !loading && (
               <div className="flex min-h-[560px] items-center justify-center rounded-3xl border border-dashed border-neutral-300 bg-white p-8 text-center">
                 <div className="max-w-md">
-                  <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-neutral-100 text-2xl">
-                    ✦
+                  <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-neutral-100">
+                    <LayoutGrid
+                      className="size-7 text-neutral-400"
+                      aria-hidden="true"
+                    />
                   </div>
 
                   <h2 className="text-2xl font-semibold">
@@ -866,10 +1018,13 @@ export default function Home() {
             {loading && (
               <div className="flex min-h-[560px] items-center justify-center rounded-3xl border border-neutral-200 bg-white">
                 <div className="text-center">
-                  <div className="mx-auto mb-5 h-10 w-10 animate-spin rounded-full border-4 border-neutral-200 border-t-neutral-950" />
+                  <Loader2
+                    className="mx-auto mb-5 size-10 animate-spin text-brand motion-reduce:animate-none"
+                    aria-hidden="true"
+                  />
 
                   <h2 className="text-xl font-semibold">
-                    Optimizing your bathroom
+                    Optimizing your bathroom...
                   </h2>
 
                   <p className="mt-2 text-sm text-neutral-500">
@@ -881,13 +1036,16 @@ export default function Home() {
             )}
 
             {result && !loading && (
-              <div className="space-y-6">
+              <div className="animate-in fade-in slide-in-from-bottom-2 space-y-6 duration-500 motion-reduce:animate-none">
                 {/* No feasible result */}
                 {result.bundles.length === 0 ? (
                   <div className="flex min-h-[420px] items-center justify-center rounded-3xl border border-amber-200 bg-amber-50 p-8 text-center">
                     <div className="max-w-lg">
-                      <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-amber-100 text-2xl">
-                        !
+                      <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-amber-100">
+                        <CircleAlert
+                          className="size-7 text-amber-700"
+                          aria-hidden="true"
+                        />
                       </div>
 
                       <h2 className="text-2xl font-semibold">
@@ -979,12 +1137,16 @@ export default function Home() {
                             </div>
                           </div>
 
-                          <div className="rounded-2xl bg-neutral-100 p-4">
-                            <div className="text-xs uppercase tracking-wider text-neutral-500">
+                          <div className="rounded-2xl bg-emerald-50 p-4 ring-1 ring-emerald-100">
+                            <div className="flex items-center gap-1.5 text-xs uppercase tracking-wider text-emerald-700">
+                              <Droplets
+                                className="size-3.5"
+                                aria-hidden="true"
+                              />
                               Annual savings
                             </div>
 
-                            <div className="mt-1 text-xl font-semibold">
+                            <div className="mt-1 text-xl font-semibold text-emerald-900">
                               {formatLiters(
                                 result.waterUsage
                                   .estimatedAnnualSavingsLiters
@@ -1039,18 +1201,30 @@ export default function Home() {
                           </p>
                         </div>
 
-                        <div className="rounded-2xl bg-neutral-100 px-4 py-3">
-                          <div className="text-xs uppercase tracking-wider text-neutral-500">
-                            Estimated annual water savings
+                        <div className="animate-in fade-in zoom-in-95 rounded-2xl bg-emerald-50 px-5 py-4 ring-1 ring-emerald-100 duration-500 motion-reduce:animate-none">
+                          <div className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-emerald-700">
+                            <Droplets
+                              className="size-4"
+                              aria-hidden="true"
+                            />
+                            Water saved
                           </div>
 
-                          <div className="mt-1 text-2xl font-semibold">
+                          <div className="mt-1 text-2xl font-semibold text-emerald-900">
                             {formatLiters(
                               result.waterUsage
                                 .estimatedAnnualSavingsLiters
                             )}{' '}
-                            L
+                            L{' '}
+                            <span className="text-base font-normal text-emerald-700">
+                              / year
+                            </span>
                           </div>
+
+                          <p className="mt-1 text-xs text-emerald-700/80">
+                            Estimated under your stated
+                            usage assumptions
+                          </p>
                         </div>
                       </div>
                     </div>
@@ -1060,13 +1234,29 @@ export default function Home() {
                       (bundle, index) => (
                         <article
                           key={bundle.id}
-                          className="rounded-3xl border border-neutral-200 bg-white p-6 shadow-sm"
+                          style={{
+                            animationDelay: `${index * 100}ms`,
+                          }}
+                          className={`animate-in fade-in slide-in-from-bottom-2 rounded-3xl border bg-white p-6 shadow-sm duration-500 motion-reduce:animate-none ${
+                            index === 0
+                              ? 'border-brand/40 ring-2 ring-brand/15'
+                              : 'border-neutral-200'
+                          }`}
                         >
                           <div className="flex flex-col justify-between gap-4 border-b border-neutral-200 pb-5 sm:flex-row sm:items-start">
                             <div>
-                              <div className="text-sm font-semibold text-neutral-500">
+                              <div className="flex flex-wrap items-center gap-2 text-sm font-semibold text-neutral-500">
                                 Recommendation{' '}
                                 {index + 1}
+                                {index === 0 && (
+                                  <span className="inline-flex items-center gap-1 rounded-full bg-brand/10 px-2 py-0.5 text-xs font-semibold text-brand">
+                                    <CheckCircle2
+                                      className="size-3"
+                                      aria-hidden="true"
+                                    />
+                                    Best match
+                                  </span>
+                                )}
                               </div>
 
                               <h3 className="mt-1 text-2xl font-semibold">
@@ -1138,7 +1328,11 @@ export default function Home() {
                                     {product.waterConsumption
                                       ?.type ===
                                       'flush' && (
-                                      <span className="rounded-full bg-neutral-100 px-2.5 py-1 text-xs text-neutral-600">
+                                      <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-1 text-xs text-emerald-700">
+                                        <Droplets
+                                          className="size-3"
+                                          aria-hidden="true"
+                                        />
                                         {product
                                           .waterConsumption
                                           .dualFlush
@@ -1150,7 +1344,11 @@ export default function Home() {
                                     {product.waterConsumption
                                       ?.type ===
                                       'flow' && (
-                                      <span className="rounded-full bg-neutral-100 px-2.5 py-1 text-xs text-neutral-600">
+                                      <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-1 text-xs text-emerald-700">
+                                        <Droplets
+                                          className="size-3"
+                                          aria-hidden="true"
+                                        />
                                         {
                                           product
                                             .waterConsumption
@@ -1161,15 +1359,35 @@ export default function Home() {
                                     )}
                                   </div>
 
+                                  {product.subcategory ===
+                                    'thermostatic-system' && (
+                                    <div className="mt-3 flex items-start gap-2 rounded-lg bg-amber-50 px-2.5 py-2 text-xs leading-4 text-amber-800">
+                                      <CircleAlert
+                                        className="mt-0.5 size-3.5 shrink-0"
+                                        aria-hidden="true"
+                                      />
+                                      <span>
+                                        Valve body only —
+                                        compatible
+                                        control-panel trim
+                                        sold separately.
+                                      </span>
+                                    </div>
+                                  )}
+
                                   <a
                                     href={
                                       product.productUrl
                                     }
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="mt-4 inline-flex text-xs font-medium underline underline-offset-4 hover:text-neutral-600"
+                                    className="mt-4 inline-flex items-center gap-1 text-xs font-medium underline underline-offset-4 hover:text-neutral-600"
                                   >
-                                    View KOHLER product ↗
+                                    View KOHLER product
+                                    <ExternalLink
+                                      className="size-3"
+                                      aria-hidden="true"
+                                    />
                                   </a>
                                 </div>
                               )
@@ -1182,24 +1400,29 @@ export default function Home() {
                               [
                                 'Style',
                                 bundle.scores.styleMatch,
+                                'bg-neutral-950',
                               ],
                               [
                                 'Water',
                                 bundle.scores.sustainability,
+                                'bg-emerald-500',
                               ],
                               [
                                 'Value',
                                 bundle.scores.value,
+                                'bg-neutral-950',
                               ],
                               [
                                 'Space',
                                 bundle.scores.spaceFit,
+                                'bg-neutral-950',
                               ],
                               [
                                 'Coherence',
                                 bundle.scores.coherence,
+                                'bg-neutral-950',
                               ],
-                            ].map(([label, score]) => (
+                            ].map(([label, score, barColor]) => (
                               <div
                                 key={label as string}
                               >
@@ -1210,7 +1433,7 @@ export default function Home() {
 
                                 <div className="mt-2 h-2 overflow-hidden rounded-full bg-neutral-100">
                                   <div
-                                    className="h-full rounded-full bg-neutral-950"
+                                    className={`h-full rounded-full ${barColor} transition-[width] duration-700 ease-out`}
                                     style={{
                                       width: `${score}%`,
                                     }}

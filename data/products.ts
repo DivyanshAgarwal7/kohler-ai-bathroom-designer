@@ -10,6 +10,13 @@ import { KohlerProduct } from '@/types/product';
  * - Faucet/shower overall envelope dimensions are not published in the
  *   accessible product text, so those four records are intentionally marked
  *   "estimated" rather than claiming full verification.
+ * - The Innate smart toilet (t3) and Anthem thermostatic valve (s3) add
+ *   official KOHLER India technical specification-sheet PDFs
+ *   (techcomm.kohler.com / resources.kohler.com) as a source in addition to
+ *   the product pages themselves. t3's envelope is confirmed against a
+ *   labeled diagram; s3's raw numbers come from the same kind of sheet but
+ *   the axis mapping could not be confirmed from extracted text, so it
+ *   keeps an "estimated" dataConfidence.
  * - Do not treat an "estimated" dimension as manufacturer-certified CAD data.
  */
 
@@ -81,6 +88,58 @@ export const KOHLER_PRODUCTS: KohlerProduct[] = [
     imageUrl: '/images/products/odeon.jpg',
     topViewSvg: '/icons/fixtures/toilet-wallhung.svg',
     verificationDate: '2026-09-15',
+    dataConfidence: 'verified'
+  },
+  {
+    id: 't3',
+    modelNumber: 'K-29777IN-0',
+    name: 'Innate One-Piece Elongated Smart Toilet, Dual-Flush',
+    category: 'toilet',
+    subcategory: 'smart',
+    priceINR: 379999,
+    // Overall envelope taken from KOHLER's official India technical
+    // specification sheet for this exact SKU (techcomm.kohler.com,
+    // K-29777IN_spec_IN_Kohler_en.pdf): 17" (432 mm) width, 28-5/16"
+    // (719 mm) depth, 24-3/8" (619 mm) height.
+    dimensions: { widthMM: 432, depthMM: 719, heightMM: 619 },
+    installation: {
+      type: 'floor-mount',
+      roughInMM: 305,
+      requiresElectrical: true,
+      electricalSpec: '220-240V, 10A, 50-60Hz dedicated GFCI circuit',
+      plumbingType: 'standard',
+      notes:
+        'Includes toilet and seat, supply stop valve, braided inlet supply hose, power cord, and remote control. Requires a dedicated electrical outlet near the installation point for the cleansing seat.'
+    },
+    waterConsumption: {
+      type: 'flush',
+      dualFlush: true,
+      fullFlushLPF: 5.0,
+      reducedFlushLPF: 3.5
+    },
+    style: {
+      themes: ['minimalist-modern', 'contemporary'],
+      collection: 'Innate',
+      finishes: ['white'],
+      defaultFinish: 'white'
+    },
+    smartFeatures: [
+      'bidet',
+      'heated-seat',
+      'auto-flush',
+      'auto-open-close',
+      'led-nightlight',
+      'warm-air-dryer',
+      'remote-control',
+      'quiet-close-seat',
+      'uv-self-cleaning-wand',
+      'deodorizer'
+    ],
+    productUrl:
+      'https://www.kohler.co.in/p/toilets/innate-one-piece-elongated-smart-toilet-dual-flush-29777in',
+    imageUrl: '/images/products/innate-smart-toilet.jpg',
+    topViewSvg: '/icons/fixtures/toilet-smart.svg',
+    verificationDate: '2026-09-17',
     dataConfidence: 'verified'
   },
 
@@ -231,6 +290,49 @@ export const KOHLER_PRODUCTS: KohlerProduct[] = [
     imageUrl: '/images/products/statement-handshower.jpg',
     topViewSvg: '/icons/fixtures/shower-hand.svg',
     verificationDate: '2026-09-15',
+    dataConfidence: 'estimated'
+  },
+  {
+    id: 's3',
+    modelNumber: 'K-26341IN-NA',
+    name: 'Anthem Three-Port Thermostatic Valve — component of thermostatic shower system',
+    category: 'shower',
+    subcategory: 'thermostatic-system',
+    priceINR: 46639,
+    // Concealed rough-in valve body. The envelope figures below are taken
+    // from KOHLER's official India spec sheet (resources.kohler.com,
+    // K-26341IN_spec_IN_Kohler_en.pdf: 13-15/16" (354 mm), 6-5/16"
+    // (160 mm), 6-1/8" (156 mm)), but the diagram's axis labels aren't
+    // recoverable from the extracted text, so — like the faucet and
+    // showerhead/handshower records above — this is marked "estimated"
+    // rather than claiming full verification. It has no independent floor
+    // footprint: it lives inside the wall/shower zone, not on the floor.
+    dimensions: { widthMM: 354, depthMM: 156, heightMM: 160 },
+    installation: {
+      type: 'wall-mount',
+      roughInMM: null,
+      requiresElectrical: false,
+      electricalSpec: null,
+      plumbingType: 'concealed',
+      notes:
+        'Valve body only — compatible control-panel trim sold separately. Mechanical (non-electronic) thermostatic mixing valve with a built-in temperature-limit stop for antiscald protection; cast dezincification-resistant brass body, fully serviceable from the front. Requires a separately sold three-outlet Anthem control panel trim (e.g. K-26347IN-9) to expose temperature/flow control on the finished wall; the valve body itself ships with no exposed finish.'
+    },
+    waterConsumption: null,
+    style: {
+      themes: ['contemporary', 'minimalist-modern'],
+      collection: 'Anthem',
+      finishes: ['polished-chrome'],
+      defaultFinish: 'polished-chrome'
+    },
+    // Mechanical valve — no electronic/smart features. Antiscald
+    // temperature-limit protection is a mechanical safety spec, not a
+    // "smart" feature, so it's documented in installation.notes instead.
+    smartFeatures: [],
+    productUrl:
+      'https://www.kohler.co.in/p/diverters-trims/anthem-three-port-recessed-mechanical-thermostatic-valve-26341in',
+    imageUrl: '/images/products/anthem-thermostatic-valve.jpg',
+    topViewSvg: '/icons/fixtures/shower-thermostatic.svg',
+    verificationDate: '2026-09-17',
     dataConfidence: 'estimated'
   },
 

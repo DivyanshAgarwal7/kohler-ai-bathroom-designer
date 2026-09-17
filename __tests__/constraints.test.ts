@@ -2,6 +2,7 @@ import { test, describe } from 'node:test';
 import * as assert from 'node:assert';
 import { validateBudget, validateCategoryCoverage, checkProductFitsZone } from '../lib/engine/constraints';
 import { KohlerProduct } from '../types/product';
+import { KOHLER_PRODUCTS } from '../data/products';
 
 const mockToilet: KohlerProduct = {
   id: 't1',
@@ -53,5 +54,52 @@ describe('Hard Constraints Engine', () => {
     };
     // 5x5 ft room (small). Small room template assigns 800x550 zone. Should fail.
     assert.strictEqual(checkProductFitsZone(hugeVanity, 5, 5), false);
+  });
+});
+
+describe('New product classes fit their assigned zones', () => {
+  const smartToilet = KOHLER_PRODUCTS.find((p) => p.id === 't3') as KohlerProduct;
+  const thermostaticValve = KOHLER_PRODUCTS.find((p) => p.id === 's3') as KohlerProduct;
+
+  test('smart toilet fits the toilet zone in a typical room', () => {
+    assert.ok(smartToilet);
+    assert.strictEqual(checkProductFitsZone(smartToilet, 8, 10), true);
+  });
+
+  test('smart toilet fits the toilet zone even in a small room', () => {
+    assert.strictEqual(checkProductFitsZone(smartToilet, 6, 6), true);
+  });
+
+  test('thermostatic valve fits the shower zone (no fake floor footprint)', () => {
+    assert.ok(thermostaticValve);
+    assert.strictEqual(checkProductFitsZone(thermostaticValve, 8, 10), true);
+    assert.strictEqual(checkProductFitsZone(thermostaticValve, 6, 6), true);
+
+    // It should occupy a small fraction of the shower zone, not a
+    // fabricated fixture-sized footprint.
+    const zoneArea = 900 * 900; // smallest shower zone
+    const productArea =
+      thermostaticValve.dimensions.widthMM *
+      thermostaticValve.dimensions.depthMM;
+
+    assert.ok(productArea < zoneArea * 0.2);
+  });
+
+  test('validateBudget and validateCategoryCoverage work with the new products', () => {
+    assert.strictEqual(
+      validateBudget([smartToilet, thermostaticValve], 500000),
+      true
+    );
+    assert.strictEqual(
+      validateBudget([smartToilet, thermostaticValve], 100000),
+      false
+    );
+    assert.strictEqual(
+      validateCategoryCoverage([smartToilet, thermostaticValve], [
+        'toilet',
+        'shower',
+      ]),
+      true
+    );
   });
 });

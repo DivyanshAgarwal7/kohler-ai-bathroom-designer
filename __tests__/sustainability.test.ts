@@ -2,6 +2,7 @@ import { test, describe } from 'node:test';
 import * as assert from 'node:assert';
 import { calculateProductWaterEfficiencyScore, calculateAnnualWaterUsage } from '../lib/engine/sustainability';
 import { KohlerProduct } from '../types/product';
+import { KOHLER_PRODUCTS } from '../data/products';
 
 const mockEfficientToilet: KohlerProduct = {
   id: 't1', modelNumber: '', name: '', category: 'toilet', subcategory: '', priceINR: 0,
@@ -34,5 +35,32 @@ describe('Sustainability Engine', () => {
     assert.ok(result.baselineAnnualLiters > 0);
     assert.ok(result.estimatedAnnualSavingsLiters > 0);
     assert.strictEqual(result.bundleAnnualLiters + result.estimatedAnnualSavingsLiters, result.baselineAnnualLiters);
+  });
+});
+
+describe('New product classes do not break sustainability calculations', () => {
+  const smartToilet = KOHLER_PRODUCTS.find((p) => p.id === 't3') as KohlerProduct;
+  const thermostaticValve = KOHLER_PRODUCTS.find((p) => p.id === 's3') as KohlerProduct;
+
+  test('smart toilet dual-flush water efficiency score is between 0 and 1', () => {
+    const score = calculateProductWaterEfficiencyScore(smartToilet);
+    assert.ok(score >= 0 && score <= 1);
+  });
+
+  test('thermostatic valve (null waterConsumption) is safely excluded from usage totals', () => {
+    assert.strictEqual(thermostaticValve.waterConsumption, null);
+
+    const result = calculateAnnualWaterUsage([thermostaticValve]);
+
+    assert.strictEqual(result.bundleAnnualLiters, 0);
+    assert.strictEqual(result.baselineAnnualLiters, 0);
+    assert.strictEqual(result.estimatedAnnualSavingsLiters, 0);
+  });
+
+  test('a bundle mixing both new products still produces a sane annual usage total', () => {
+    const result = calculateAnnualWaterUsage([smartToilet, thermostaticValve]);
+
+    assert.ok(result.bundleAnnualLiters > 0);
+    assert.ok(result.baselineAnnualLiters > 0);
   });
 });

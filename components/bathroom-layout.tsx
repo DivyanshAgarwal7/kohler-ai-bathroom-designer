@@ -8,6 +8,7 @@ import {
   Text,
   Line,
 } from 'react-konva';
+import { LayoutGrid } from 'lucide-react';
 
 import { KohlerProduct } from '@/types/product';
 import { LayoutData } from '@/types/recommendation';
@@ -46,9 +47,10 @@ export default function BathroomLayout({
   const offsetY = (canvasHeight - roomHeight) / 2;
 
   return (
-    <div className="overflow-hidden rounded-3xl border border-neutral-200 bg-white">
+    <div className="animate-in fade-in slide-in-from-bottom-2 overflow-hidden rounded-3xl border border-neutral-200 bg-white duration-500 motion-reduce:animate-none">
       <div className="border-b border-neutral-200 px-5 py-4">
-        <div className="text-sm font-semibold uppercase tracking-wider text-neutral-500">
+        <div className="flex items-center gap-1.5 text-sm font-semibold uppercase tracking-wider text-neutral-500">
+          <LayoutGrid className="size-4" aria-hidden="true" />
           2D bathroom plan
         </div>
 
@@ -130,6 +132,30 @@ export default function BathroomLayout({
               const y =
                 offsetY + placement.y * scale;
 
+              // Concealed wall-mounted valve body: it has no floor
+              // footprint, so it must not be drawn as a scaled
+              // width/depth rectangle like a real floor fixture. Render
+              // a small, subtly outlined control marker instead.
+              if (
+                product.subcategory ===
+                'thermostatic-system'
+              ) {
+                return (
+                  <Rect
+                    key={placement.productId}
+                    x={x}
+                    y={y}
+                    width={72}
+                    height={32}
+                    fill="#fafafa"
+                    stroke="#525252"
+                    strokeWidth={1.25}
+                    dash={[4, 3]}
+                    cornerRadius={4}
+                  />
+                );
+              }
+
               const width =
                 product.dimensions.widthMM * scale;
 
@@ -167,6 +193,29 @@ export default function BathroomLayout({
 
               const y =
                 offsetY + placement.y * scale;
+
+              // Matches the outlined marker above: a wall/system
+              // component label, not the generic floor-fixture category
+              // label, so it doesn't read as an interchangeable "SHOWER"
+              // fixture footprint.
+              if (
+                product.subcategory ===
+                'thermostatic-system'
+              ) {
+                return (
+                  <Text
+                    key={`${placement.productId}-label`}
+                    x={x}
+                    y={y + 12}
+                    width={72}
+                    text="THERMOSTATIC"
+                    fontSize={7}
+                    fontStyle="bold"
+                    fill="#404040"
+                    align="center"
+                  />
+                );
+              }
 
               const width = Math.max(
                 product.dimensions.widthMM * scale,
