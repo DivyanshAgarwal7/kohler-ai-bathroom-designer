@@ -21,6 +21,29 @@ The system combines **multimodal AI for understanding** with **deterministic Typ
 
 The application does not ask an LLM to invent product facts or decide which products fit. AI extracts structured requirements and provides natural-language interpretation, while deterministic logic performs product filtering, constraint validation, scoring, sustainability calculations, and layout generation.
 
+
+## Demo Video
+
+[Watch the 2–3 minute demo](https://drive.google.com/file/d/1ozDnsm9-w8QnqDovwd7U8lFCAz7PrQsp/view?usp=sharing)
+
+The video demonstrates:
+1. Natural-language requirement input
+2. AI requirement interpretation
+3. Optional bathroom image analysis
+4. Deterministic recommendation generation
+5. KOHLER product bundle
+6. Sustainability estimate
+7. 2D bathroom feasibility visualization
+8. AI/deterministic architecture boundary
+
+
+## Documentation
+
+- [Prompt Documentation](docs/Prompts_Documentation.pdf)
+- [Presentation Deck](docs/KOHLER_Track1_Deck_Divyansh_Agarwal.pdf)
+- [Live Demo](https://kohler-ai-bathroom-designer-alpha.vercel.app/)
+
+
 ## Key Features
 
 ### AI requirement understanding
@@ -397,7 +420,7 @@ The automated suite covers:
 | Thermostatic showers | Thermostatic-system component support |
 | Vanities | Catalog category |
 | Space fit | Zone-based dimensional validation |
-| 2D/3D representation | 2D bathroom feasibility visualization |
+| 2D representation | 2D bathroom feasibility visualization |
 | Water conservation | Deterministic water-use/savings estimates |
 | Explainability | Budget, score, product and sustainability explanation |
 
@@ -466,7 +489,7 @@ Explanation + water impact
 ```text
 Bathroom: 7 × 9 ft
 Budget: ₹1,50,000
-Household: 5
+Household: 4
 Style: Minimalist Modern
 Required fixtures: Toilet, Faucet, Shower, Vanity
 ```
@@ -496,7 +519,7 @@ Potential future improvements:
 
 ## Project Status
 
-**Status:** Production-ready prototype / competition submission build
+**Status:** Production-ready prototype
 
 Current build includes:
 
@@ -509,13 +532,6 @@ Current build includes:
 - Production build validation
 - Vercel deployment
 - GitHub source control
-
-
-## Documentation
-
-- [Prompt Documentation](docs/Prompts_Documentation.pdf)
-- [Presentation Deck](docs/KOHLER_Track1_Deck_Divyansh_Agarwal.pdf)
-- [Live Demo](https://kohler-ai-bathroom-designer-alpha.vercel.app/)
 
 
 ## Acknowledgements
